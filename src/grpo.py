@@ -155,7 +155,7 @@ class GRPOTrainer:
         completion_lengths = completion_mask.sum(dim=-1).float()
 
         return {
-            "loss": loss.item(),
+            "loss": loss.item() *  self.grad_accum,
             "reward_mean": rewards_flat.mean().item(),
             "reward_std": rewards_flat.std().item(),
             "zero_adv_fraction": zero_adv_fraction,
