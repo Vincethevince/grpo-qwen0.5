@@ -5,7 +5,7 @@ SYSTEM_PROMPT = (
     "At the end, write your final answer as: #### <number>"
 )
 
-def extract_gsm8k_asnwer(answer_field:str) -> str:
+def extract_gsm8k_answer(answer_field:str) -> str:
     """Extract ground truth from GSM8K's answer field (always uses '####' separator)"""
     return answer_field.split('####')[-1].strip().replace(",", "")
 
@@ -21,7 +21,7 @@ def format_example(example:dict, tokenizer) -> dict:
 
     return {
         "prompt": prompt,
-        "answer": extract_gsm8k_asnwer(example["answer"]),
+        "answer": extract_gsm8k_answer(example["answer"]),
     }
 
 def load_gsm8k(tokenizer, split:str = "train"):
