@@ -226,6 +226,7 @@ class GRPOTrainer:
     def train(self, dataloader):
         step = 0
         micro_step = 0
+        metrics = None 
         while step < self.cfg["max_steps"]:
             for batch in dataloader:
                 metrics = self.train_step(batch)
@@ -242,3 +243,5 @@ class GRPOTrainer:
                         print(f"Step {step}/{self.cfg['max_steps']}: {metrics}")
                     if step >= self.cfg["max_steps"]:
                         break
+        
+        return metrics
