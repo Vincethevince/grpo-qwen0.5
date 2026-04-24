@@ -1,0 +1,24 @@
+model: Qwen/Qwen2.5-0.5B-Instruct
+dataset: openai/gsm8k
+split: train
+
+# GRPO core
+num_generations: 2        # group size G
+reward_fn: binary         # binary (+1/-1) or positive_only (0/+1)
+temperature: 1.0
+top_p: 0.95
+
+# Training
+batch_size: 2
+learning_rate: 1.0e-5
+per_device_train_batch_size: 1
+max_steps: 2
+max_prompt_length: 128
+max_completion_length: 16
+
+# KL penalty
+beta: 0.04
+
+# Logging
+logging_steps: 2
+output_dir: ./results/smoke
