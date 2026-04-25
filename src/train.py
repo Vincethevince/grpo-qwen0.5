@@ -33,7 +33,7 @@ def train(config_path: Path, reward_name: str):
     
     if reward_name not in REWARD_FUNCTIONS:
         raise ValueError(
-            f"Unknown reward function={reward_fn}. Options: {list(REWARD_FUNCTIONS)}"
+            f"Unknown reward function={reward_name}. Options: {list(REWARD_FUNCTIONS)}"
             )
     reward_fn = REWARD_FUNCTIONS[reward_name]
     device = config.get("device") or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -47,10 +47,10 @@ def train(config_path: Path, reward_name: str):
     print(f"Model: {model_name}")
     print(f"Reward: {reward_name}")
     print(f"Device: {device}")                                                  
-    print(f"Dataset: {len(dataset)} examples, batch_size={config['batch_size']},G={config['num_generations']}")   
+    print(f"Dataset: {len(dataset)} examples, batch_size={config['per_device_train_batch_size']},G={config['num_generations']}")   
 
 
-    loader = DataLoader(dataset, batch_size=config["batch_size"], shuffle=False)
+    loader = DataLoader(dataset, batch_size=config["per_device_train_batch_size"], shuffle=False)
     trainer = GRPOTrainer(model_name, tokenizer, reward_fn, config, device)
 
     start = datetime.now()
