@@ -2,6 +2,7 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from transformers import AutoModelForCausalLM
+from datetime import datetime
 
 class GRPOTrainer:
     def __init__(self, model_name, tokenizer, reward_fn, config, device="cuda"):
@@ -240,7 +241,7 @@ class GRPOTrainer:
                     if step % self.cfg["logging_steps"] == 0:
                         # Only metrics of last micro step are logged, could average over those in future
                         metrics["grad_norm"] = grad_norm.item()
-                        print(f"Step {step}/{self.cfg['max_steps']}: {metrics}")
+                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Step {step}/{self.cfg['max_steps']}: {metrics}")
                     if step >= self.cfg["max_steps"]:
                         break
         
