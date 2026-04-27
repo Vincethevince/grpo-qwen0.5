@@ -224,7 +224,7 @@ class GRPOTrainer:
 
         return input_ids, attention_mask, completion_mask
     
-    def train(self, dataloader):
+    def train(self, dataloader, output_dir):
         step = 0
         micro_step = 0
         metrics = None 
@@ -242,7 +242,12 @@ class GRPOTrainer:
                         # Only metrics of last micro step are logged, could average over those in future
                         metrics["grad_norm"] = grad_norm.item()
                         print(f"[{datetime.now().strftime('%H:%M:%S')}] Step {step}/{self.cfg['max_steps']}: {metrics}")
+
                     if step >= self.cfg["max_steps"]:
                         break
+                        
+                    if step % self.cfg.get("save_steps", 100) == 0:
+                        ckpt_dir = output_dir / f"checkpoint-{step}"
+                        self.model.save_pretrained(ckpt_dir)
         
         return metrics

@@ -52,12 +52,16 @@ def train(config_path: Path, reward_name: str):
 
     loader = DataLoader(dataset, batch_size=config["per_device_train_batch_size"], shuffle=False)
     trainer = GRPOTrainer(model_name, tokenizer, reward_fn, config, device)
-
+    
     start = datetime.now()
-    metrics = trainer.train(loader)
+    run_name = f"{config_path.stem}-{start.strftime('%Y%m%d_%H%M%S')}"
+    out_dir = Path("results")/run_name
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    metrics = trainer.train(loader, out_dir)
     elapsed = datetime.now() - start
 
-    run_name = f"{config_path.stem}-{start.strftime('%Y%m%d_%H%M%S')}"
+    
     print(f"Elapsed time: {elapsed.total_seconds()}s. Writing to results/{run_name}/meta.json")
 
     meta = {
@@ -68,10 +72,12 @@ def train(config_path: Path, reward_name: str):
         "reward_name": reward_name,
     }
     
-    out_dir = Path("results")/run_name
-    out_dir.mkdir(parents=True, exist_ok=True)
+    # Save results
     with open(out_dir/"meta.json","w") as f:
         json.dump(meta, f, indent=4)
+    
+    trainer.model.save_pretrained(out_dir / "policy")
+    trainer.tokenizer.save_pretrained(out_dir / "policy")
 
 
 
@@ -97,5 +103,3 @@ if __name__ == "__main__":
     reward_fn = args.reward_fn
 
     train(config_path,reward_fn)
-
- 
