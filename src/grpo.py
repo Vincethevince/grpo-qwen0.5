@@ -14,15 +14,22 @@ class GRPOTrainer:
 
         model_dtype = torch.bfloat16 if device=="cuda" else torch.float32
 
+        # FA2 needs Ampere+ (A100=8.0, T4=7.5). Fall back to eager on T4
+        attn_impl = "flash_attention_2" if(
+            device == "cuda" and torch.cuda.get_device_capability()[0] >= 8
+        ) else "eager"
+
         # Policy Model - gets trained
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype = model_dtype
+            model_name, dtype = model_dtype, attn_implementation=attn_impl,
         ).to(device)
 
         # Reference Model - frozen model for KL penalty
         self.ref_model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype = model_dtype
+            model_name, dtype = model_dtype, attn_implementation=attn_impl,
         ).to(device)
+
+        print(f"Attention impl: {attn_impl}")
 
         self.ref_model.eval()
         for p in self.ref_model.parameters():
