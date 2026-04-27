@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from transformers import AutoModelForCausalLM
 from datetime import datetime
+import json
 
 class GRPOTrainer:
     def __init__(self, model_name, tokenizer, reward_fn, config, device="cuda"):
@@ -232,23 +233,45 @@ class GRPOTrainer:
         return input_ids, attention_mask, completion_mask
     
     def train(self, dataloader, output_dir):
+        # step = optimizer, micro_step = batch
         step = 0
         micro_step = 0
         metrics = None 
+
+        metric_buffer = []  # micro-step metrics dicts (cadence: every micro_step)
+        grad_norms = []     # one per optimizer step (cadence: every grad_accum micro-steps)
+        
         while step < self.cfg["max_steps"]:
             for batch in dataloader:
                 metrics = self.train_step(batch)
                 micro_step += 1
 
+                metric_buffer.append(metrics)
+
                 if micro_step % self.grad_accum == 0:
                     grad_norm = torch.nn.utils.clip_grad_norm_(self.model.parameters(),1.0)
+                    grad_norms.append(grad_norm.item())
+
                     self.optimizer.step()
                     self.optimizer.zero_grad()
                     step += 1
+
                     if step % self.cfg["logging_steps"] == 0:
-                        # Only metrics of last micro step are logged, could average over those in future
-                        metrics["grad_norm"] = grad_norm.item()
-                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Step {step}/{self.cfg['max_steps']}: {metrics}")
+                        # Calc avg over last optimizer steps
+                        avg = {k: sum(d[k] for d in metric_buffer) / len(metric_buffer) for k in metric_buffer[0]}
+                        avg["grad_norm"] = sum(grad_norms) / len(grad_norms)
+                        avg["step"] = step
+                        avg["n_micro"] = len(metric_buffer)
+                        avg["n_optim"] = len(grad_norms)
+                        
+                        # Logging
+                        print(f"[{datetime.now().strftime('%H:%M:%S')}] Step {step}/{self.cfg['max_steps']}: {avg}")
+                        with open(output_dir / "train_metrics.jsonl", "a") as f:
+                            f.write(json.dumps(avg) + "\n")
+
+                        # Clear buffers
+                        metric_buffer.clear()
+                        grad_norms.clear()
 
                     if step >= self.cfg["max_steps"]:
                         break
