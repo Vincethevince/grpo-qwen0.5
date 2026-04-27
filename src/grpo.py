@@ -4,6 +4,10 @@ from torch.utils.data import DataLoader
 from transformers import AutoModelForCausalLM
 from datetime import datetime
 import json
+import importlib.util
+
+def _flash_attn_available() ->bool:
+    return importlib.util.find_spec("flash_attn") is not None
 
 class GRPOTrainer:
     def __init__(self, model_name, tokenizer, reward_fn, config, device="cuda"):
@@ -17,7 +21,7 @@ class GRPOTrainer:
 
         # FA2 needs Ampere+ (A100=8.0, T4=7.5). Fall back to eager on T4
         attn_impl = "flash_attention_2" if(
-            device == "cuda" and torch.cuda.get_device_capability()[0] >= 8
+            device == "cuda" and torch.cuda.get_device_capability()[0] >= 8 and _flash_attn_available()
         ) else "eager"
 
         # Policy Model - gets trained
@@ -240,7 +244,7 @@ class GRPOTrainer:
 
         metric_buffer = []  # micro-step metrics dicts (cadence: every micro_step)
         grad_norms = []     # one per optimizer step (cadence: every grad_accum micro-steps)
-        
+
         while step < self.cfg["max_steps"]:
             for batch in dataloader:
                 metrics = self.train_step(batch)
