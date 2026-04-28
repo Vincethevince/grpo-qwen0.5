@@ -1,0 +1,34 @@
+{
+    "config": {
+        "model": "Qwen/Qwen2.5-0.5B-Instruct",
+        "dataset": "openai/gsm8k",
+        "split": "train",
+        "num_generations": 8,
+        "reward_fn": "binary",
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "learning_rate": 5e-06,
+        "per_device_train_batch_size": 1,
+        "gradient_accumulation_steps": 4,
+        "max_steps": 500,
+        "max_prompt_length": 256,
+        "max_completion_length": 512,
+        "save_steps": 100,
+        "seed": 42,
+        "beta": 0.04,
+        "logging_steps": 10,
+        "output_dir": "./results/baseline"
+    },
+    "final_metrics": {
+        "loss": 0.0006510764360427856,
+        "reward_mean": 0.75,
+        "reward_std": 0.7071067690849304,
+        "zero_adv_fraction": 0.0,
+        "mean_completion_len": 241.875,
+        "kl": 0.01627100445330143,
+        "ratio": 1.0
+    },
+    "duration_sec": 30503.011095,
+    "timestamp": "2026-04-27T19:38:42.780403",
+    "reward_name": "binary"
+}
