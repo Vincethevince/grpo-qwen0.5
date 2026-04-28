@@ -1,0 +1,9 @@
+{
+  "model": "results/baseline-20260427_193842/policy",
+  "num_examples": 500,
+  "accuracy": 0.476,
+  "mean_reward": -0.048,
+  "mean_completion_len": 290.976,
+  "temperature": 0.0,
+  "timestamp": "2026-04-28T08:42:37.313830"
+}
