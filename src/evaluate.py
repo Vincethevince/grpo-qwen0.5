@@ -45,11 +45,10 @@ def evaluate(
         device == "cuda" and torch.cuda.get_device_capability()[0] >= 8 and _flash_attn_available()
     ) else "eager"
 
-    # Tokenizer - try final checkpoint first, else fall back to base
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
-    except:
-        tokenizer = AutoTokenizer.from_pretrained(base_model)
+    # Tokenizer - for intermediate checkpoints use base_model
+    ckpt_path = Path(model_path)
+    is_intermediate = ckpt_path.name.startswith("checkpoint-")
+    tokenizer = AutoTokenizer.from_pretrained(base_model if is_intermediate else model_path)
 
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
