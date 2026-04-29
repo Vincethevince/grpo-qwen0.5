@@ -23,4 +23,3 @@ beta: 0.04
 
 # Logging
 logging_steps: 10
-output_dir: ./results/baseline
