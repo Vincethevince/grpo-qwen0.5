@@ -1,9 +1,9 @@
 {
   "model": "results/baseline-20260427_193842/policy",
-  "num_examples": 500,
-  "accuracy": 0.476,
-  "mean_reward": -0.048,
-  "mean_completion_len": 290.976,
+  "num_examples": 1000,
+  "accuracy": 0.484,
+  "mean_reward": -0.032,
+  "mean_completion_len": 293.049,
   "temperature": 0.0,
-  "timestamp": "2026-04-28T08:42:37.313830"
+  "timestamp": "2026-04-30T16:30:43.441260"
 }
