@@ -1,9 +1,9 @@
 {
   "model": "results/ablation_g4-20260429_081647/policy",
-  "num_examples": 500,
-  "accuracy": 0.46,
-  "mean_reward": -0.08,
-  "mean_completion_len": 293.902,
+  "num_examples": 1000,
+  "accuracy": 0.467,
+  "mean_reward": -0.066,
+  "mean_completion_len": 293.976,
   "temperature": 0.0,
-  "timestamp": "2026-04-29T17:06:54.704237"
+  "timestamp": "2026-04-30T13:23:53.632856"
 }
